@@ -1,0 +1,24 @@
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+  <h1>Login</h1>
+
+  <div>
+    <select id="user">
+      <option value="1">User One</option>
+      <option value="2">User Two</option>
+    </select>
+  </div>
+  <div>
+    <button id="login">login</button>
+  </div>
+</body>
+<script>
+  document.getElementById("login").addEventListener("click",evt => {
+    //this is a child window of the bootstrap, so we talk directly to it
+    window.opener.login(document.getElementById("user").value);
+  });
+</script>
+</html>

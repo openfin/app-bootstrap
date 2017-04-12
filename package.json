@@ -1,0 +1,23 @@
+{
+    "name": "app-bootstrap",
+    "version": "0.0.1",
+    "description": "Example of the OpenFin App Bootstrap Pattern",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/openfin/app-bootstrap"
+    },
+    "author": "Nicholas Kolba",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/openfin/app-bootstrap/issues"
+    },
+    "homepage": "https://github.com/openfin/app-bootstrap",
+    "scripts": {
+       "start": "http-server -p 5099 -c-1"
+     },
+     "devDependencies": {
+       "http-server": "0.8.5",
+       "openfin-cli": "1.1.5"
+     }
+
+}

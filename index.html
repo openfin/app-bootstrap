@@ -1,0 +1,308 @@
+
+<script>
+  /*
+    This is an example of an application bootstrap pattern in OpenFin.
+    OpenFin uses the concept of an App Manifest which configures the destination for the app to be run and the assets to load
+    The manifest file is opened by the RVM (Runtime Version Manager)
+    There is no opportunity for user login/authentication on the RVM side, so user identity cannot be known when the manifest is accessed
+    This means that the manifest is limited to being a generic specification for the app
+    User-specific configuration can't happen
+
+    The application bootstrap solves this problem by having the initial manifest launch a generic (and headless) bootstrap which
+    does the following:
+      1. checks the user credentials (in middleware - mocked here) and challenges for user login as needed
+      2. loads the 'real' app content based on the user identity
+      3. sticks around in the background to monitor the health and state of its apps
+  */
+  //global namespace
+  var g = {};
+
+
+
+  /*
+    auth cookie would be checked on the server
+    mock login challenge here
+  */
+    g.loginWindow = new fin.desktop.Window({
+    name: "loginWindow",
+    url: "login.html",
+    defaultWidth: 320,
+    defaultHeight: 320,
+    defaultCenter:true,
+    frame: false,
+    resize: false,
+    autoShow: true,
+    saveWindowState:false
+}, () => {
+    console.log("The window has successfully been created");
+}, () => {
+    console.log("Error creating window");
+});
+
+function login(user){
+
+
+
+  //hide the login window
+  g.loginWindow.hide();
+
+  //show loading animation
+  showLoading();
+
+  //setup form callback, submit the form
+  doLogin(user, onLogin, onLoginError);
+
+  //close the login window
+  g.loginWindow.close();
+}
+
+function doLogin(user, success, failure) {
+  var u = parseInt(user) -1;
+  var config = [[
+    {
+        entity:"app",
+        props:{
+          "name": "appA",
+          "url": "http://localhost:5099/ws-1/appA.html",
+          "uuid": "ws-1-appA",
+          "autoShow": true,
+          "icon": "http://localhost:8080/openfin.ico"
+        },
+        "position":{
+          left:.5,
+          top:0,
+          width:.5,
+          height:.5
+        }
+      },
+      {
+        entity:"app",
+        props:{
+          "name": "appB",
+          "url": "http://localhost:5099/ws-1/appB.html",
+          "uuid": "ws-1-appB",
+          "autoShow": true,
+          "icon": "http://localhost:8080/openfin.ico"
+        },
+        "position":{
+          left:.5,
+          top:.5,
+          width:.5,
+          height:.5
+        }
+      }],
+      [
+        {
+            entity:"app",
+            props:{
+              "name": "appA",
+              "url": "http://localhost:5099/ws-2/appA.html",
+              "uuid": "ws-2-appA",
+              "autoShow": true,
+              "icon": "http://localhost:8080/openfin.ico"
+            },
+            "position":{
+              left:.5,
+              top:0,
+              width:.5,
+              height:.5
+            }
+          },
+          {
+            entity:"app",
+            props:{
+              "name": "appB",
+              "url": "http://localhost:5099/ws-2/appB.html",
+              "uuid": "ws-2-appB",
+              "autoShow": true,
+              "icon": "http://localhost:8080/openfin.ico"
+            },
+            "position":{
+              left:.5,
+              top:.5,
+              width:.5,
+              height:.5
+            }
+          }]
+    ];
+
+  window.setTimeout(function(){
+    success.call(this,config[u]);
+  },2000);
+}
+
+/* login response handler
+    this would recieve a configuration describing apps to launch for the user
+*/
+function onLogin(config){
+  //hide loading animation
+  hideLoading();
+
+  //parse the config and load the assets
+  //assets can be a mix of OpenFin applications & external applications
+  loadWorkspace(config);
+}
+
+//
+function loadWorkspace(ws){
+
+  function position(app,p, callback){
+    if (p){
+      //is it maximized?
+      if (p.max){
+        app.getWindow().maximize();
+        app.getWindow().bringToFront();
+      }
+      else {
+        fin.desktop.System.getMonitorInfo(info => {
+          pMonitor = info.primaryMonitor.monitorRect;
+          var h = p.height > 1 ? p.height : pMonitor.bottom * p.height;
+          var w = p.width > 1 ? p.width : pMonitor.right * p.width;
+          var l = pMonitor.right * p.left;
+          var t = pMonitor.bottom * p.top;
+
+          app.getWindow().moveTo(l,t, function(){
+          app.getWindow().resizeTo(w,h,"top-left",function(){
+            if (callback){
+              callback.call(this);
+            }
+          });
+
+         },e => {console.log(e);});
+
+       });
+      }
+    }
+  }
+
+  //no op if we don't find a definition
+  if (ws){
+  //diff the workspace items
+  //get list of new ids
+//  var newApps = ws.map(w => {return w.props.uuid;});
+//  console.log("ws apps",newApps);
+  //removes
+
+
+  //cleanup existing if they are not in the new set
+/*  var tempApps = [];
+  appsR.forEach(a => {
+    var ap = a;
+      if (newApps.indexOf(ap) < 0){
+        tempApps.push(ap);
+      }
+  });*/
+
+  /*appsR.forEach(a => {
+    var ap = a;
+      if (newApps.indexOf(ap) < 0){
+        fin.desktop.Application.wrap(ap).close();
+      }
+  });*/
+
+
+/* function closeNext(){
+   console.log("closeNext");
+   console.log(tempApps);
+    if (tempApps.length > 0){
+      fin.desktop.Application.wrap(tempApps.pop()).close(function(){closeNext();},e =>{
+        console.log(e);
+        closeNext();
+      });
+    }
+  }*/
+
+//  if (appsR.length > 0){
+//    closeNext();
+//  }
+  //reset the list of apps for current ws state
+//  appsR = newApps;
+
+  //load the new stuff
+  ws.forEach(i => {
+    //enclose the item
+    var item = i;
+    if (item.entity === "app" && item.props.url){
+
+      var app = new fin.desktop.Application(item.props, function(){
+        app.run(function(){
+        //  appsR.push(app.uuid);
+        position(app, item.position, function(){
+
+          app.getWindow().animate({
+            opacity:{
+              opacity:1,
+              duration:1000
+            }
+          },{
+            interrupt:false
+          },function(){
+            app.getWindow().show();
+          });
+
+        });
+
+      /*    window.setTimeout(function(){
+            console.log(app.uuid, currentSymbol);
+            fin.desktop.InterApplicationBus.send(app.uuid,"newSymbol",{symbolName:currentSymbol});
+          },1000);*/
+        });
+
+
+    },function(e){
+      console.log(e);
+      position(app, item.position);
+    });
+    }
+
+  });
+
+  //update
+/*  ws.forEach(i => {
+    //enclose the item
+    var item = i;
+    if (item.entity === "app"){
+
+      var app = new fin.desktop.Application.wrap(item.props.uuid);
+      position(app, item.position);
+
+    }
+
+  });*/
+
+  //to do: transitions, etc
+
+}
+}
+
+
+/*
+  display a loading animation while main app assets are loading
+*/
+function showLoading(){
+  g.showL = new fin.desktop.Window({
+  name: "loadingWindow",
+  url: "loading.html",
+  defaultCenter:true,
+  frame: false,
+  opacity:.5,
+  autoShow: false,
+  saveWindowState:false
+}, () => {
+  g.showL.maximize();
+  g.showL.show();
+}, () => {
+  console.log("Error creating window");
+});
+}
+
+function hideLoading(){
+  g.showL.close();
+}
+
+/* login fail handler
+*/
+function onLoginError(err){
+
+}
+</script>

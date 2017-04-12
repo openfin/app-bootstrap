@@ -1,0 +1,22 @@
+{
+    "startup_app": {
+        "name": "app-bootstrap",
+        "description": "Demonstration of the OpenFin App Bootstrap Pattern",
+        "url": "http://localhost:5099/index.html",
+        "icon": "http://localhost:5099/openfin.ico",
+        "uuid": "app-bootstrap-id",
+        "autoShow": true,
+        "alwaysOnTop": false
+    },
+    "runtime": {
+        "arguments": "",
+        "version": "6.49.18.41"
+    },
+    "appAssets": [],
+    "shortcut": {
+        "company": "OpenFin",
+        "description": "Demonstration of the OpenFin App Bootstrap Pattern",
+        "icon": "http://localhost:5099/openfin.ico",
+        "name": "App Bootstrap"
+    }
+}
