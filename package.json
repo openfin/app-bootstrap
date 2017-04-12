@@ -13,11 +13,14 @@
     },
     "homepage": "https://github.com/openfin/app-bootstrap",
     "scripts": {
-       "start": "http-server -p 5099 -c-1"
+       "start": "node app.js"
      },
      "devDependencies": {
        "http-server": "0.8.5",
        "openfin-cli": "1.1.5"
+     },
+     "dependencies":{
+       "express": "^4.15.2"
      }
 
 }

@@ -18,7 +18,7 @@
   var g = {};
 
 
-
+function showLogin(){
   /*
     auth cookie would be checked on the server
     mock login challenge here
@@ -38,6 +38,9 @@
 }, () => {
     console.log("Error creating window");
 });
+}
+
+showLogin();
 
 function login(user){
 
@@ -58,77 +61,32 @@ function login(user){
 
 function doLogin(user, success, failure) {
   var u = parseInt(user) -1;
-  var config = [[
-    {
-        entity:"app",
-        props:{
-          "name": "appA",
-          "url": "http://localhost:5099/ws-1/appA.html",
-          "uuid": "ws-1-appA",
-          "autoShow": true,
-          "icon": "http://localhost:8080/openfin.ico"
-        },
-        "position":{
-          left:.5,
-          top:0,
-          width:.5,
-          height:.5
-        }
-      },
-      {
-        entity:"app",
-        props:{
-          "name": "appB",
-          "url": "http://localhost:5099/ws-1/appB.html",
-          "uuid": "ws-1-appB",
-          "autoShow": true,
-          "icon": "http://localhost:8080/openfin.ico"
-        },
-        "position":{
-          left:.5,
-          top:.5,
-          width:.5,
-          height:.5
-        }
-      }],
-      [
-        {
-            entity:"app",
-            props:{
-              "name": "appA",
-              "url": "http://localhost:5099/ws-2/appA.html",
-              "uuid": "ws-2-appA",
-              "autoShow": true,
-              "icon": "http://localhost:8080/openfin.ico"
-            },
-            "position":{
-              left:.5,
-              top:0,
-              width:.5,
-              height:.5
-            }
-          },
-          {
-            entity:"app",
-            props:{
-              "name": "appB",
-              "url": "http://localhost:5099/ws-2/appB.html",
-              "uuid": "ws-2-appB",
-              "autoShow": true,
-              "icon": "http://localhost:8080/openfin.ico"
-            },
-            "position":{
-              left:.5,
-              top:.5,
-              width:.5,
-              height:.5
-            }
-          }]
-    ];
-
+  //simulate a slow backend/network, so we can see the loading animation
   window.setTimeout(function(){
-    success.call(this,config[u]);
-  },2000);
+    if (u === 2){
+      document.location.href="fin://localhost:5090/manifest.json";
+      //hide loading animation
+      hideLoading();
+    }
+    else {
+
+        //make AJAX request for configuration
+        var req = new XMLHttpRequest();
+        var url = `http://localhost:5090/doLogin?user=${u}`;
+        req.onreadystatechange = function(){
+          if (req.readyState === XMLHttpRequest.DONE) {
+              success.call(this,JSON.parse(req.responseText));
+
+          }
+        }
+
+        req.open("GET",url);
+
+        req.send(null);
+      }
+
+    },1000);
+
 }
 
 /* login response handler
@@ -177,46 +135,6 @@ function loadWorkspace(ws){
 
   //no op if we don't find a definition
   if (ws){
-  //diff the workspace items
-  //get list of new ids
-//  var newApps = ws.map(w => {return w.props.uuid;});
-//  console.log("ws apps",newApps);
-  //removes
-
-
-  //cleanup existing if they are not in the new set
-/*  var tempApps = [];
-  appsR.forEach(a => {
-    var ap = a;
-      if (newApps.indexOf(ap) < 0){
-        tempApps.push(ap);
-      }
-  });*/
-
-  /*appsR.forEach(a => {
-    var ap = a;
-      if (newApps.indexOf(ap) < 0){
-        fin.desktop.Application.wrap(ap).close();
-      }
-  });*/
-
-
-/* function closeNext(){
-   console.log("closeNext");
-   console.log(tempApps);
-    if (tempApps.length > 0){
-      fin.desktop.Application.wrap(tempApps.pop()).close(function(){closeNext();},e =>{
-        console.log(e);
-        closeNext();
-      });
-    }
-  }*/
-
-//  if (appsR.length > 0){
-//    closeNext();
-//  }
-  //reset the list of apps for current ws state
-//  appsR = newApps;
 
   //load the new stuff
   ws.forEach(i => {
@@ -238,14 +156,11 @@ function loadWorkspace(ws){
             interrupt:false
           },function(){
             app.getWindow().show();
+            app.getWindow().bringToFront();
           });
 
         });
 
-      /*    window.setTimeout(function(){
-            console.log(app.uuid, currentSymbol);
-            fin.desktop.InterApplicationBus.send(app.uuid,"newSymbol",{symbolName:currentSymbol});
-          },1000);*/
         });
 
 
@@ -256,21 +171,6 @@ function loadWorkspace(ws){
     }
 
   });
-
-  //update
-/*  ws.forEach(i => {
-    //enclose the item
-    var item = i;
-    if (item.entity === "app"){
-
-      var app = new fin.desktop.Application.wrap(item.props.uuid);
-      position(app, item.position);
-
-    }
-
-  });*/
-
-  //to do: transitions, etc
 
 }
 }
@@ -285,12 +185,13 @@ function showLoading(){
   url: "loading.html",
   defaultCenter:true,
   frame: false,
-  opacity:.5,
+  opacity:.75,
   autoShow: false,
   saveWindowState:false
 }, () => {
-  g.showL.maximize();
   g.showL.show();
+  g.showL.maximize();
+
 }, () => {
   console.log("Error creating window");
 });
