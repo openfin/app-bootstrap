@@ -20,7 +20,9 @@
        "openfin-cli": "1.1.5"
      },
      "dependencies":{
-       "express": "^4.15.2"
+       "express": "^4.15.2",
+       "cookie-parser":"1.4.3"
+
      }
 
 }

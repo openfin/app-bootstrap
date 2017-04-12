@@ -1,7 +1,10 @@
-var express = require('express')
-var app = express()
+var express = require('express');
+var app = express();
+var cookieParser = require('cookie-parser');
 
 app.use(express.static("."));
+
+app.use(cookieParser());
 
 app.get('/doLogin',function(req,res){
   var r = '';
@@ -73,17 +76,40 @@ app.get('/doLogin',function(req,res){
           }]
     ];
   var u = req.query.user;
-  r = conf[u];
+  //mock setting user credentials cookie
+  //support multiple user personas
+  //set cookie with list of users
+
+  //To DO: get users cookie from req... manage adding, removing user
+  var ucookie = req.cookies ? req.cookies.users : null;
+console.log("ucookie " + ucookie);
+  if (ucookie) {
+
+    ucookie = ucookie.split(",");
+
+
+  if (ucookie.indexOf(u) === -1){
+    console.log("add persona " + u);
+    ucookie.push(u);
+    res.cookie("users",ucookie.join(","));
+  }
+}
+else {
+    res.cookie("users",u);
+}
+  //
+  r = conf[(u-1)];
   res.send(r);
 });
 
-app.get('/manifest.json', function (req, res) {
+app.get('/manifest', function (req, res) {
   var ts = Date.now();
+
   res.send(`{
       "startup_app": {
           "name": "ws1-appA",
           "description": "Demonstration of the OpenFin App Bootstrap Pattern",
-          "url": "http://localhost:5090/realm/appA.html",
+          "url": "http://localhost:5090/realm/appA.html?user=${req.query.user}",
           "icon": "http://localhost:5090/openfin.ico",
           "uuid": "ws1-appA",
           "autoShow": true,

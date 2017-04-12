@@ -55,16 +55,16 @@ function login(user){
   //setup form callback, submit the form
   doLogin(user, onLogin, onLoginError);
 
-  //close the login window
-  g.loginWindow.close();
+  //minimize the login window
+  g.loginWindow.minimize();
 }
 
 function doLogin(user, success, failure) {
-  var u = parseInt(user) -1;
+  var u = parseInt(user);
   //simulate a slow backend/network, so we can see the loading animation
   window.setTimeout(function(){
-    if (u === 2){
-      document.location.href="fin://localhost:5090/manifest.json";
+    if (u === 3){
+      document.location.href="fin://localhost:5090/manifest?user=openfin";
       //hide loading animation
       hideLoading();
     }
