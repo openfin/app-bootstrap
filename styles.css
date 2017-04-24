@@ -3,3 +3,9 @@ body {
   color:#eee;
   font-family: sans-serif;
 }
+
+body.target-2 {
+  background-color:#fff;
+  color:#222;
+  font-family: sans-serif;
+}
