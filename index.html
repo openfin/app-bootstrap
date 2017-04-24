@@ -33,7 +33,9 @@ function showLogin(){
     frame: false,
     resize: false,
     autoShow: true,
-    saveWindowState:false
+    saveWindowState:false,
+    icon:"http://cdn.openfin.co/hyperblotter/favicon.ico",
+    taskbarIconGroup:"app-bootstrap-id"
 }, () => {
     console.log("The window has successfully been created");
 }, () => {
@@ -144,7 +146,16 @@ function loadWorkspace(ws){
   ws.forEach(i => {
     //enclose the item
     var item = i;
-    if (item.entity === "app" && item.props.url){
+    if (item.entity === "asset"){
+      if (item.props.alias){
+        //launch the asset
+        fin.desktop.System.launchExternalProcess({
+          alias: item.props.alias
+        //	arguments: args
+      },function(){},er => {console.log(er);});
+      }
+    }
+    else if (item.entity === "app" && item.props.url){
 
       var app = new fin.desktop.Application(item.props, function(){
         app.run(function(){

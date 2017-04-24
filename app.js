@@ -9,6 +9,10 @@ app.use(cookieParser());
 app.get('/doLogin',function(req,res){
   var r = '';
   var conf =  [[
+    {entity:"asset",
+    props:{
+      alias:"hyperblotter-chart"}
+    },
     {
         entity:"app",
         props:{
@@ -16,7 +20,8 @@ app.get('/doLogin',function(req,res){
           "url": "http://localhost:5090/ws-1/appA.html",
           "uuid": "ws-1-appA",
           "autoShow": true,
-          "icon": "http://localhost:8080/openfin.ico"
+          icon:"http://localhost:5090/openfin.ico",
+          taskbarIconGroup:"app-bootstrap-id"
         },
         "position":{
           left:.5,
@@ -32,7 +37,8 @@ app.get('/doLogin',function(req,res){
           "url": "http://localhost:5090/ws-1/appB.html",
           "uuid": "ws-1-appB",
           "autoShow": true,
-          "icon": "http://localhost:8080/openfin.ico"
+          icon:"http://localhost:5090/openfin.ico",
+          taskbarIconGroup:"app-bootstrap-id"
         },
         "position":{
           left:.5,
@@ -42,6 +48,10 @@ app.get('/doLogin',function(req,res){
         }
       }],
       [
+        {entity:"asset",
+        props:{
+          alias:"hyperblotter-chart2"}
+        },
         {
             entity:"app",
             props:{
@@ -49,7 +59,8 @@ app.get('/doLogin',function(req,res){
               "url": "http://localhost:5090/ws-2/appA.html",
               "uuid": "ws-2-appA",
               "autoShow": true,
-              "icon": "http://localhost:8080/openfin.ico"
+              icon:"http://localhost:5090/openfin.ico",
+              taskbarIconGroup:"app-bootstrap-id"
             },
             "position":{
               left:.5,
@@ -65,7 +76,8 @@ app.get('/doLogin',function(req,res){
               "url": "http://localhost:5090/ws-2/appB.html",
               "uuid": "ws-2-appB",
               "autoShow": true,
-              "icon": "http://localhost:8080/openfin.ico"
+              icon:"http://localhost:5090/openfin.ico",
+              taskbarIconGroup:"app-bootstrap-id"
             },
             "position":{
               left:.5,

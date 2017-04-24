@@ -5,14 +5,26 @@
         "url": "http://localhost:5090/index.html",
         "icon": "http://localhost:5090/openfin.ico",
         "uuid": "app-bootstrap-id",
-        "autoShow": false,
-        "alwaysOnTop": false
+        "autoShow": false
     },
     "runtime": {
         "arguments": "",
         "version": "stable"
     },
-    "appAssets": [],
+    "appAssets": [
+        {
+            "src": "http://localhost:5090/assets/Basic.zip",
+            "alias": "hyperblotter-chart",
+            "target": "HyperblotterChart.exe",
+            "version": "1.0.0"
+        },
+        {
+            "src": "http://localhost:5090/assets/Advanced.zip",
+            "alias": "hyperblotter-chart2",
+            "target": "HyperblotterChart.exe",
+            "version": "1.0.0"
+        }
+    ],
     "shortcut": {
         "company": "OpenFin",
         "description": "Demonstration of the OpenFin App Bootstrap Pattern",
