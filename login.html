@@ -3,8 +3,8 @@
   <title>Login</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <h1>Login</h1>
+<body style='border:5px solid cadetblue'>
+  <h1 style='-webkit-app-region:drag;text-align:center;'>Login</h1>
 
   <div>
     <select id="user">
@@ -14,12 +14,16 @@
     </select>
 
     <button id="login">login</button>
+    <button id="logout">logout</button>
   </div>
 </body>
 <script>
   document.getElementById("login").addEventListener("click",evt => {
     //this is a child window of the bootstrap, so we talk directly to it
     window.opener.login(document.getElementById("user").value);
+  });
+  document.getElementById("logout").addEventListener("click",evt => {
+    window.opener.closeOtherApps();
   });
 </script>
 </html>

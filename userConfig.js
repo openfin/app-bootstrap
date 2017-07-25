@@ -3,7 +3,7 @@ const conf = [
         {
             entity: "asset",
             props: {
-                alias: "hyperblotter-chart"
+                alias: "hyperblotter-chart2"
             }
         },
         {
@@ -41,39 +41,31 @@ const conf = [
             }
         },
         {
-            entity: "app",
+            entity: 'app',
             props: {
-                "name": "Hyperblotter",
-                "description": "Hyperblotter Demo",
-                "url": "http://localhost:5090/hyperblotterBuilds/revamped/index.html",
-                "icon": "http://localhost:5090/hyperblotterBuilds/revamped/images/hyperblotter_icon.ico",
-                "uuid": "hyperblotter",
-                "autoShow": true,
-                "defaultWidth": 360,
-                "maxWidth": 360,
-                "minWidth": 360,
-                "maxHeight": 90,
-                "defaultHeight": 90,
-                "minHeight": 90,
-                "defaultTop": 50,
-                "defaultLeft": 10,
-                "resizable": false,
-                "maximizable": false,
-                "frame": false,
-                "alwaysOnTop": true,
-                "cornerRounding": {
-                    "width": 5,
-                    "height": 5
-                }
+                name: 'hyperblotteroriginal',
+                url: 'http://localhost:5090/hyperblotterBuilds/original/index.html',
+                uuid: 'hyperblotteroriginal',
+                autoShow: true,
+                frame: false,
+                alwaysOnTop: true,
+                defaultTop: 50,
+                defaultLeft: 10,
+                cornerRounding: {
+                    width: 5,
+                    height: 5
+                },
+                defaultHeight: 90,
+                defaultWidth: 360,
+                icon: 'http://localhost:5090/hyperblotterBuilds/original/images/hyperblotter_icon.ico'
             }
-
         }
     ],
     [
         {
             entity: "asset",
             props: {
-                alias: "hyperblotter-chart2"
+                alias: "hyperblotter-chart"
             }
         },
         {
@@ -111,26 +103,45 @@ const conf = [
             }
         },
         {
-            entity: 'app',
+            entity: "app",
             props: {
-                name: 'hyperblotter',
-                url: 'http://localhost:5090/hyperblotterBuilds/original/index.html',
-                uuid: 'hyperblotter',
-                autoShow: true,
-                frame: false,
-                alwaysOnTop: true,
-                defaultTop: 50,
-                defaultLeft: 10,
-                cornerRounding: {
-                    width: 5,
-                    height: 5
-                },
-                defaultHeight: 90,
-                defaultWidth: 360,
-                icon: 'http://localhost:5090/hyperblotterBuilds/original/images/hyperblotter_icon.ico'
+                "name": "HyperblotterRevamped",
+                "description": "Hyperblotter Demo",
+                "url": "http://localhost:5090/hyperblotterBuilds/revamped/index.html",
+                "icon": "http://localhost:5090/hyperblotterBuilds/revamped/images/hyperblotter_icon.ico",
+                "uuid": "hyperblotter",
+                "autoShow": true,
+                "defaultWidth": 360,
+                "maxWidth": 360,
+                "minWidth": 360,
+                "maxHeight": 90,
+                "defaultHeight": 90,
+                "minHeight": 90,
+                "defaultTop": 50,
+                "defaultLeft": 10,
+                "resizable": false,
+                "maximizable": false,
+                "frame": false,
+                "alwaysOnTop": true,
+                "cornerRounding": {
+                    "width": 5,
+                    "height": 5
+                }
+            }
+
+        }
+    ]
+    /*
+    ,
+    [
+        {
+            entity: "asset",
+            props: {
+                alias: "hyperblotter-chart2"
             }
         }
     ]
+    */
 ];
 
 module.exports = conf;

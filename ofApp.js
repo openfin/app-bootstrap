@@ -31,6 +31,32 @@ app.get('/doLogin',function(req,res){
     res.send(r);
 });
 
+// app.get('/manifest', function (req, res) {
+//     var ts = Date.now();
+//     res.send(`{
+//         "startup_app": {
+//             "name": "ws1-appA",
+//             "description": "Demonstration of the OpenFin App Bootstrap Pattern",
+//             "url": "http://localhost:5090/realm/appA.html?user=${req.query.user}",
+//             "icon": "http://localhost:5090/openfin.ico",
+//             "uuid": "ws1-appA",
+//             "autoShow": true,
+//             "alwaysOnTop": false
+//         },
+//         "runtime": {
+//             "arguments": "--security-realm=bgcTest-${ts}",
+//             "version": "stable"
+//         },
+//         "appAssets": [],
+//         "shortcut": {
+//             "company": "OpenFin",
+//             "description": "Demonstration of the OpenFin App Bootstrap Pattern",
+//             "icon": "http://localhost:5090/openfin.ico",
+//             "name": "App Bootstrap"
+//         }
+//         }`
+//     );
+// });
 app.get('/manifest', function (req, res) {
     var ts = Date.now();
     res.send(`{
