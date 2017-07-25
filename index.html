@@ -1,6 +1,5 @@
-
 <script>
-  /*
+    /*
     This is an example of an application bootstrap pattern in OpenFin.
     OpenFin uses the concept of an App Manifest which configures the destination for the app to be run and the assets to load
     The manifest file is opened by the RVM (Runtime Version Manager)
@@ -14,211 +13,212 @@
       2. loads the 'real' app content based on the user identity
       3. sticks around in the background to monitor the health and state of its apps
   */
-  //global namespace
-  var g = {};
+    //global namespace
+    var g = {};
 
 
-/* bring up the login UI as a child window */
-function showLogin(){
-  /*
-    auth cookie would be checked on the server
-    mock login challenge here
-  */
-    g.loginWindow = new fin.desktop.Window({
-    name: "loginWindow",
-    url: "login.html",
-    defaultWidth: 320,
-    defaultHeight: 320,
-    defaultCenter:true,
-    frame: false,
-    resize: false,
-    autoShow: true,
-    saveWindowState:false,
-    icon:"http://cdn.openfin.co/hyperblotter/favicon.ico",
-    taskbarIconGroup:"app-bootstrap-id"
-}, () => {
-    console.log("The window has successfully been created");
-}, () => {
-    console.log("Error creating window");
-});
-}
-
-//show the login on startup
-showLogin();
-
-//callback for when login form is submitted
-function login(user){
-  //hide the login window
-  g.loginWindow.hide();
-
-  //show loading animation
-  showLoading();
-
-  //setup form callback, submit the form
-  doLogin(user, onLogin, onLoginError);
-
-  //minimize the login window
-  g.loginWindow.minimize();
-}
-
-//actual business logic of logging in
-function doLogin(user, success, failure) {
-  var u = parseInt(user);
-  //simulate a slow backend/network, so we can see the loading animation
-  window.setTimeout(function(){
-    //if it's user3, then load new app in a new browser process using the fin: protocol handler
-    if (u === 3){
-      document.location.href="fin://localhost:5090/manifest?user=openfin";
-      //hide loading animation
-      hideLoading();
+    /* bring up the login UI as a child window */
+    function showLogin() {
+        /*
+          auth cookie would be checked on the server
+          mock login challenge here
+        */
+        g.loginWindow = new fin.desktop.Window({
+            name: "loginWindow",
+            url: "login.html",
+            defaultWidth: 320,
+            defaultHeight: 320,
+            defaultCenter: true,
+            frame: false,
+            resize: false,
+            autoShow: true,
+            saveWindowState: false,
+            icon: "http://cdn.openfin.co/hyperblotter/favicon.ico",
+            taskbarIconGroup: "app-bootstrap-id"
+        }, () => {
+            console.log("The window has successfully been created");
+        }, () => {
+            console.log("Error creating window");
+        });
     }
-    //else, fetch the user configuration and use to build new apps in separate renderer processes
-    else {
 
-        //make AJAX request for configuration
-        var req = new XMLHttpRequest();
-        var url = `http://localhost:5090/doLogin?user=${u}`;
-        req.onreadystatechange = function(){
-          if (req.readyState === XMLHttpRequest.DONE) {
-              success.call(this,JSON.parse(req.responseText));
+    //show the login on startup
+    showLogin();
 
-          }
+    //callback for when login form is submitted
+    function login(user) {
+        //hide the login window
+        g.loginWindow.hide();
+
+        //show loading animation
+        showLoading();
+
+        //setup form callback, submit the form
+        doLogin(user, onLogin, onLoginError);
+
+        //minimize the login window
+        g.loginWindow.minimize();
+    }
+
+    //actual business logic of logging in
+    function doLogin(user, success, failure) {
+        var u = parseInt(user);
+        //simulate a slow backend/network, so we can see the loading animation
+        window.setTimeout(function () {
+            //if it's user3, then load new app in a new browser process using the fin: protocol handler
+            if (u === 3) {
+                document.location.href = "fin://localhost:5090/manifest?user=openfin";
+                //hide loading animation
+                hideLoading();
+            }
+            //else, fetch the user configuration and use to build new apps in separate renderer processes
+            else {
+
+                //make AJAX request for configuration
+                var req = new XMLHttpRequest();
+                var url = `http://localhost:5090/doLogin?user=${u}`;
+                req.onreadystatechange = function () {
+                    if (req.readyState === XMLHttpRequest.DONE) {
+                        success.call(this, JSON.parse(req.responseText));
+
+                    }
+                }
+
+                req.open("GET", url);
+
+                req.send(null);
+            }
+
+        }, 1000);
+    }
+
+    /* login response handler
+        this would recieve a configuration describing apps to launch for the user
+    */
+    function onLogin(config) {
+        //hide loading animation
+        hideLoading();
+
+        //parse the config and load the assets
+        //assets can be a mix of OpenFin applications & external applications
+        loadWorkspace(config);
+    }
+
+    /* parse the user configuration returned from the server.
+      i.e. load and position apps
+    */
+    function loadWorkspace(ws) {
+
+        function position(app, p, callback) {
+            if (p) {
+                //is it maximized?
+                if (p.max) {
+                    app.getWindow().maximize();
+                    app.getWindow().bringToFront();
+                }
+                else {
+                    fin.desktop.System.getMonitorInfo(info => {
+                        pMonitor = info.primaryMonitor.monitorRect;
+                        var h = p.height > 1 ? p.height : pMonitor.bottom * p.height;
+                        var w = p.width > 1 ? p.width : pMonitor.right * p.width;
+                        var l = pMonitor.right * p.left;
+                        var t = pMonitor.bottom * p.top;
+
+                        app.getWindow().moveTo(l, t, function () {
+                            app.getWindow().resizeTo(w, h, "top-left", function () {
+                                if (callback) {
+                                    callback.call(this);
+                                }
+                            });
+
+                        }, e => { console.log(e); });
+
+                    });
+                }
+            }
         }
 
-        req.open("GET",url);
+        //no op if we don't find a definition
+        if (ws) {
 
-        req.send(null);
-      }
+            //load the new stuff
+            ws.forEach(i => {
+                //enclose the item
+                var item = i;
+                if (item.entity === "asset") {
+                    if (item.props.alias) {
+                        //launch the asset
+                        fin.desktop.System.launchExternalProcess({
+                            alias: item.props.alias
+                            //	arguments: args
+                        }, function () { }, er => { console.log(er); });
+                    }
+                }
+                else if (item.entity === "app" && item.props.url) {
 
-    },1000);
-}
+                    var app = new fin.desktop.Application(item.props, function () {
+                        app.run(function () {
+                            //  appsR.push(app.uuid);
+                            position(app, item.position, function () {
 
-/* login response handler
-    this would recieve a configuration describing apps to launch for the user
-*/
-function onLogin(config){
-  //hide loading animation
-  hideLoading();
+                                app.getWindow().animate({
+                                    opacity: {
+                                        opacity: 1,
+                                        duration: 1000
+                                    }
+                                }, {
+                                        interrupt: false
+                                    }, function () {
+                                        app.getWindow().show();
+                                        app.getWindow().bringToFront();
+                                    });
 
-  //parse the config and load the assets
-  //assets can be a mix of OpenFin applications & external applications
-  loadWorkspace(config);
-}
+                            });
 
-/* parse the user configuration returned from the server.
-  i.e. load and position apps
-*/
-function loadWorkspace(ws){
+                        });
 
-  function position(app,p, callback){
-    if (p){
-      //is it maximized?
-      if (p.max){
-        app.getWindow().maximize();
-        app.getWindow().bringToFront();
-      }
-      else {
-        fin.desktop.System.getMonitorInfo(info => {
-          pMonitor = info.primaryMonitor.monitorRect;
-          var h = p.height > 1 ? p.height : pMonitor.bottom * p.height;
-          var w = p.width > 1 ? p.width : pMonitor.right * p.width;
-          var l = pMonitor.right * p.left;
-          var t = pMonitor.bottom * p.top;
 
-          app.getWindow().moveTo(l,t, function(){
-          app.getWindow().resizeTo(w,h,"top-left",function(){
-            if (callback){
-              callback.call(this);
-            }
-          });
+                    }, function (e) {
+                        console.log(e);
+                        position(app, item.position);
+                    });
+                }
 
-         },e => {console.log(e);});
+            });
 
-       });
-      }
+        }
     }
-  }
 
-  //no op if we don't find a definition
-  if (ws){
 
-  //load the new stuff
-  ws.forEach(i => {
-    //enclose the item
-    var item = i;
-    if (item.entity === "asset"){
-      if (item.props.alias){
-        //launch the asset
-        fin.desktop.System.launchExternalProcess({
-          alias: item.props.alias
-        //	arguments: args
-      },function(){},er => {console.log(er);});
-      }
-    }
-    else if (item.entity === "app" && item.props.url){
+    /*
+      display a loading animation while main app assets are loading
+    */
+    function showLoading() {
+        g.showL = new fin.desktop.Window({
+            name: "loadingWindow",
+            url: "loading.html",
+            defaultCenter: true,
+            frame: false,
+            opacity: .75,
+            autoShow: false,
+            saveWindowState: false
+        }, () => {
+            g.showL.show();
+            g.showL.maximize();
 
-      var app = new fin.desktop.Application(item.props, function(){
-        app.run(function(){
-        //  appsR.push(app.uuid);
-        position(app, item.position, function(){
-
-          app.getWindow().animate({
-            opacity:{
-              opacity:1,
-              duration:1000
-            }
-          },{
-            interrupt:false
-          },function(){
-            app.getWindow().show();
-            app.getWindow().bringToFront();
-          });
-
+        }, () => {
+            console.log("Error creating window");
         });
-
-        });
-
-
-    },function(e){
-      console.log(e);
-      position(app, item.position);
-    });
     }
 
-  });
+    function hideLoading() {
+        g.showL.close();
+    }
 
-}
-}
+    /* login fail handler
+    */
+    function onLoginError(err) {
 
+    }
 
-/*
-  display a loading animation while main app assets are loading
-*/
-function showLoading(){
-  g.showL = new fin.desktop.Window({
-  name: "loadingWindow",
-  url: "loading.html",
-  defaultCenter:true,
-  frame: false,
-  opacity:.75,
-  autoShow: false,
-  saveWindowState:false
-}, () => {
-  g.showL.show();
-  g.showL.maximize();
-
-}, () => {
-  console.log("Error creating window");
-});
-}
-
-function hideLoading(){
-  g.showL.close();
-}
-
-/* login fail handler
-*/
-function onLoginError(err){
-
-}
 </script>
