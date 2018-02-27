@@ -31,7 +31,7 @@ res.send(`{
         "alwaysOnTop": false
     },
     "runtime": {
-        "arguments": "--security-realm=bgcTest-${ts}",
+        "arguments": "--security-realm=my-security-realm-${ts}",
         "version": "stable"
     },
     ...
