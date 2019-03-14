@@ -142,5 +142,5 @@ app.get('/manifest', function (req, res) {
 })
 
 app.listen(5090, function () {
-  console.log('App Bootstrap exampple listening on port 5090!')
+  console.log('App Bootstrap example listening on port 5090!')
 })
